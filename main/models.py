@@ -10,3 +10,8 @@ class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
+    
+# models.py
+class Hotel(models.Model):
+	name = models.CharField(max_length=50)
+	hotel_Main_Img = models.ImageField(upload_to='static/images/')

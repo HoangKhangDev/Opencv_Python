@@ -8,34 +8,74 @@ cap.set(3, 640) # width
 cap.set(4, 480) #height
 
 min_area = 500
-count = 0
 
-while True:
-    success, img = cap.read()
+cap01=""
+cap02=""
+k=0
 
-    plate_cascade = cv2.CascadeClassifier(harcascade)
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def basic():
+    count = 0
+    while True:
+        success, img = cap.read()
+        plate_cascade = cv2.CascadeClassifier(harcascade)
 
-    plates = plate_cascade.detectMultiScale(img_gray, 1.1, 4)
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        plates = plate_cascade.detectMultiScale(img_gray, 1.1, 4)
 
-    for (x,y,w,h) in plates:
-        area = w * h
+        for (x, y, w, h) in plates:
+            area = w * h
 
-        if area > min_area:
-            cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
-            cv2.putText(img, "Number Plate", (x,y-5), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 255), 2)
+            if area > min_area:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.putText(img, "Number Plate", (x, y - 5), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 255), 2)
 
-            img_roi = img[y: y+h, x:x+w]
-            cv2.imshow("ROI", img_roi)
+                img_roi = img[y: y + h, x:x + w]
+                cap01=cv2.imshow("ROI", img_roi)
 
+        cap02=cv2.imshow("Result", img)
 
-    
-    cv2.imshow("Result", img)
+        if cv2.waitKey(1) & 0xFF == ord('s'):
+            cv2.imwrite("plates/scaned_img_" + str(count) + ".jpg", img_roi)
+            cv2.rectangle(img, (0, 200), (640, 300), (0, 255, 0), cv2.FILLED)
+            cv2.putText(img, "Plate Saved", (150, 265), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 0, 255), 2)
+            cv2.imshow("Results", img)
+            cv2.waitKey(500)
+            count += 1
 
-    if cv2.waitKey(1) & 0xFF == ord('s'):
-        cv2.imwrite("plates/scaned_img_" + str(count) + ".jpg", img_roi)
-        cv2.rectangle(img, (0,200), (640,300), (0,255,0), cv2.FILLED)
-        cv2.putText(img, "Plate Saved", (150, 265), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 0, 255), 2)
-        cv2.imshow("Results",img)
-        cv2.waitKey(500)
-        count += 1
+def stream():
+    count = 0
+    while True:
+        success, img = cap.read()
+        plate_cascade = cv2.CascadeClassifier(harcascade)
+
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        plates = plate_cascade.detectMultiScale(img_gray, 1.1, 4)
+        if k == 27:         # wait for ESC key to exit
+            cv2.destroyAllWindows()
+        for (x, y, w, h) in plates:
+            area = w * h
+
+            if area > min_area:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.putText(img, "Number Plate", (x, y - 5), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 255), 2)
+
+                img_roi = img[y: y + h, x:x + w]
+                cv2.imwrite("rs_roi.jpg", img_roi)
+                cv2.imshow("ROI.jpg", img_roi)
+        cv2.imshow("Result", img)
+        if cv2.waitKey(1) & 0xFF == ord('s'):
+            cv2.imwrite("plates/scaned_img_" + str(count) + ".jpg", img_roi)
+            cv2.rectangle(img, (0, 200), (640, 300), (0, 255, 0), cv2.FILLED)
+            cv2.putText(img, "Plate Saved", (150, 265), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 0, 255), 2)
+            cv2.imshow("Results", img)
+            cv2.waitKey(500)
+            count += 1
+
+stream()
+
+def closecap_01():
+    cap01.destroyAllWindows();
+
+def closecap_02():
+    cap02.destroyAllWindows();
+
